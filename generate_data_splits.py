@@ -50,11 +50,8 @@ def generate_stratified_kfold(args, out_log):
                 cat_values = np.arange(len(conditions))
                 # assign the generated categorical values to a generated feature in df
                 df.loc[index, generated_feature] = np.select(conditions, cat_values, default=-999)
-                print('AQUI: ', quantiles)
             # append the previous generated feature to stratify_columns
             stratify_columns.append(generated_feature)
-
-    print('AQUI: ', df[df[generated_feature]==-999])
     # stratify_columns = ["state", "gender", "generated_cat_1"]  # ["state", "gender", "dcany"]
 
     # store the location of each tensorflow record in a column named filename
