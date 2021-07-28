@@ -13,7 +13,7 @@ import glob, re, os
 from utils import print_file
 
 
-results_prefix = '/project/output/ABCD_save_tfrec/'
+results_prefix = '/project/output/ABCD_create_tfrecs/'
 results_logfile = results_prefix + 'output.log'
 os.makedirs(results_prefix, exist_ok=True)
 
@@ -137,7 +137,7 @@ x_mid = int(t1.shape[0]/2)
 y_mid = int(t1.shape[1]/2)
 z_mid = int(t1.shape[2]/2)
 fig_number = 100
-for n in range(2): # for n in range((len(file_list)//10)+1):
+for n in range(1): # for n in range((len(file_list)//10)+1):
     plt.figure(fig_number)
     fig_number += 1
     # create a subplot
@@ -145,7 +145,7 @@ for n in range(2): # for n in range((len(file_list)//10)+1):
     f.patch.set_facecolor('white')
     # set all subplot axis to off
     [axi.set_axis_off() for axi in ax.ravel()]
-    for i in range(2):
+    for i in range(10):
         if (n*10 + i) < len(file_list):
             t1 = load_image(file_list[n*10 + i],df)
             # display gray matter
@@ -158,7 +158,7 @@ for n in range(2): # for n in range((len(file_list)//10)+1):
             ax[i,1].imshow(np.rot90((t1[x_mid,:,:,1]),2))
             ax[i,3].imshow(np.rot90((t1[:,y_mid,:,1]),2))
             ax[i,5].imshow(np.rot90((t1[:,:,z_mid,1]),2))
-    plt.savefig(results_prefix + str(n) + 'vbm_examples.png')
+    plt.savefig(results_prefix + 'vbm_examples_' + str(n) + '.png')
 
 
 print_file(filename=results_logfile, text='##############################')
@@ -176,7 +176,7 @@ print_file(filename=results_logfile, text='Cbcltot_t(min):' + str(df['cbcl_scr_s
 print_file(filename=results_logfile, text='Cbcltot_t(max):' + str(df['cbcl_scr_syn_totprob_t'].max()))
 print_file(filename=results_logfile, text='Cbcltot_t(mean):' + str(df['cbcl_scr_syn_totprob_t'].mean()))
 print_file(filename=results_logfile, text='Cbcltot_t(sd):' + str(df['cbcl_scr_syn_totprob_t'].std()))
-print_file(filename=results_logfile, text='##############################')
+print_file(filename=results_logfile, text='##############################\n')
 
 
 def _bytes_feature(value):
@@ -220,10 +220,11 @@ noise_cleaner4d = np.repeat(noise_cleaner[:, :, :, np.newaxis], 3, axis=3)
 # create a background mask with 1's
 image_bg1_mask = (noise_cleaner * image_avg == 0)
 image_bg1_mask4d = np.repeat(image_bg1_mask[:, :, :, np.newaxis], 3, axis=3)
-print ('Saving background mask...')
+print_file(filename=results_logfile, text='Saving background mask...')
 np.save('/project/data/ABCD/ABCD_bg1_mask4d.npy',image_bg1_mask4d)
-print ('Loading background mask...')
-image_bg1_mask4d=np.load('/project/data/ABCD/ABCD_bg1_mask4d.npy')
+np.save(results_prefix+'ABCD_bg1_mask4d.npy',image_bg1_mask4d)
+print_file(filename=results_logfile, text='Loading background mask...\n')
+image_bg1_mask4d=np.load(results_prefix + 'ABCD_bg1_mask4d.npy')
 # show noise cleaner filter
 # plt.imshow((noise_cleaner4d[61,:,:,2]).astype(np.uint8))
 # plt.imshow((image_bg1_mask4d[61,:,:,2]).astype(np.uint8))
@@ -307,7 +308,7 @@ plt.savefig(results_prefix + 'filter_mask.png')
 
 
 import matplotlib.animation as animation
-VIDEO_FILEPATH = '/project/data/ABCD/noise_remove_1-5.mp4'
+VIDEO_FILEPATH = results_prefix + 'noise_remove_1-5.mp4'
 # transform images to rgba
 cmap = plt.get_cmap('gray')
 image_rgba, image_avg_rgba = cmap(image_avg), cmap(image_avg)
@@ -355,7 +356,7 @@ for index, meta_data in df.iterrows():
     # close the previous writer and open a new one every rec_per_file records
     if (index % rec_per_files == 0):
         if (index % 20 == 0):
-            print('Record:', index)
+            print_file(filename=results_logfile, text='Record:' + str(index))
         # new path to save the TFRecords file
         tfrec_filename = meta_data['FNAME_TFREC']
         # create directory if not exists
