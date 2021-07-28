@@ -1,0 +1,8 @@
+{
+  "image": "tf.io.FixedLenFeature(IMAGE_SIZE_IN, tf.float32)",
+  "info/subjectid": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/gender": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/age": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/cl_tot": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/dcany": "tf.io.FixedLenFeature([], tf.float32)"
+}

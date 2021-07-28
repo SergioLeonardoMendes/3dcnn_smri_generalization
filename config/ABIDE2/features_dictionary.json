@@ -1,0 +1,10 @@
+{
+  "image": "tf.io.FixedLenFeature(IMAGE_SIZE_IN, tf.float32)",
+  "info/SUB_ID": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/SEX_BIN": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/SITE_ID_BIN": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/AGE_AT_SCAN": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/HANDEDNESS_CATEGORY": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/FIQ": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/DX_GROUP": "tf.io.FixedLenFeature([], tf.int64)"
+}

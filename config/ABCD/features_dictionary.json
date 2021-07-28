@@ -1,0 +1,12 @@
+{
+  "image": "tf.io.FixedLenFeature(IMAGE_SIZE_IN, tf.float32)",
+  "info/subjectkey": "tf.io.FixedLenFeature([], tf.string)",
+  "info/sex_bin": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/interview_age": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/cbcl_scr_syn_internal_r": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/cbcl_scr_syn_internal_t": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/cbcl_scr_syn_external_r": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/cbcl_scr_syn_external_t": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/cbcl_scr_syn_totprob_r": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/cbcl_scr_syn_totprob_t": "tf.io.FixedLenFeature([], tf.float32)"
+}

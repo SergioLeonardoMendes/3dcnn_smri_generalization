@@ -1,0 +1,14 @@
+{
+  "image": "tf.io.FixedLenFeature(IMAGE_SIZE_IN, tf.float32)",
+  "info/SCANDIR_ID": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/GENDER": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/AGE": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/HANDEDNESS": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/VERBAL_IQ": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/PERFORMANCE_IQ": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/DX": "tf.io.FixedLenFeature([], tf.int64)",
+  "info/ADHD_MEASURE": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/ADHD_INDEX": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/INATTENTIVE": "tf.io.FixedLenFeature([], tf.float32)",
+  "info/HYPER_IMPULSIVE": "tf.io.FixedLenFeature([], tf.float32)"
+}
