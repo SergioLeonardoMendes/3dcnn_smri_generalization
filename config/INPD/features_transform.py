@@ -10,4 +10,7 @@ def features_transform(example):
     if example['info/dcany'] == 2.0:
         example['info/dcany'] = 1.0
 
+    # create age normalized
+    example['info/age_norm'] = example['info/age'] / 14.335387
+
     return example
