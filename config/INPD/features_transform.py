@@ -13,4 +13,7 @@ def features_transform(example):
     # create age normalized
     example['info/age_norm'] = example['info/age'] / 14.335387
 
+    # create cl_tot normalized
+    example['info/cl_tot_norm'] = example['info/cl_tot'] / 151.0
+
     return example
