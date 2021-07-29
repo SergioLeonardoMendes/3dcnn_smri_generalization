@@ -14,6 +14,6 @@ def features_transform(example):
     example['info/age_norm'] = example['info/age'] / 14.335387
 
     # create cl_tot normalized
-    example['info/cl_tot_norm'] = example['info/cl_tot'] / 151.0
+    example['info/cl_tot_norm'] = np.float32(example['info/cl_tot']) / 151.0
 
     return example
