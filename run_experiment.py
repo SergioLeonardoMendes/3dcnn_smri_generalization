@@ -113,6 +113,11 @@ def main(args):
     blank_idx = [''] * len(df_metrics_class)
     df_metrics_class.index = blank_idx
     # print resultant dataframes
+    print_file(filename=args.log_file, text='\n----- Write metrics to csv files -----')
+    print_file(filename=args.log_file, text='  ' + args.out_path + '/results/metrics_regression.csv')
+    print_file(filename=args.log_file, text='  ' + args.out_path + '/results/metrics_classification.csv')
+    df_metrics_reg.to_csv(args.out_path + '/results/metrics_regression.csv')
+    df_metrics_class.to_csv(args.out_path + '/results/metrics_classification.csv')
     print_file(filename=args.log_file, text='\n----- Regression Metrics -----')
     print_file(filename=args.log_file, text=df_metrics_reg.to_string())
     print_file(filename=args.log_file, text='\n----- Classification Metrics -----')
