@@ -179,8 +179,8 @@ def parse_tfrecord(serialized_example):
     background_mask4d = tf.cast((fit_background_mask != 1.0), tf.float32)
     image_fitted = image_fitted * background_mask4d
     # get the image background mask and apply a mask composed by -1's
-    # background_mask4d = fit_background_mask() #LEOTMP
-    # image_fitted = image_fitted + (background_mask4d * -1) #LEOTMP
+    background_mask4d = fit_background_mask()
+    image_fitted = image_fitted + (background_mask4d * -1)
 
     # remove csf layer
     image_fitted = image_fitted[:, :, :, :2]
