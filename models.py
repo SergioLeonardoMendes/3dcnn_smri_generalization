@@ -8,8 +8,6 @@ from coord_conv import CoordinateChannel3D
 
 
 def cnn3d(input_dim, output_bias=None, kern_reg_l2=0.001, dropout=0.5):
-    if output_bias is not None:
-        out_bias_output1 = tf.keras.initializers.Constant(output_bias[0])
 
     input_1 = keras.Input(shape=input_dim, name='image')
 
@@ -71,8 +69,13 @@ def cnn3d(input_dim, output_bias=None, kern_reg_l2=0.001, dropout=0.5):
     x3 = Dense(4, activation='relu',
                kernel_regularizer=regularizers.l2(kern_reg_l2), name='x3d1')(out_common)
     x3 = BatchNormalization(name='x3bn1')(x3)
-    output_3 = Dense(1, bias_initializer=out_bias_output1, activation='relu',
-                     name='output1', dtype='float32')(x3)
+
+    if output_bias is not None:
+        out_bias_output1 = tf.keras.initializers.Constant(output_bias[0])
+        output_3 = Dense(1, bias_initializer=out_bias_output1, activation='relu',
+                         name='output1', dtype='float32')(x3)
+    else:
+        output_3 = Dense(1, activation='relu', name='output1', dtype='float32')(x3)
 
     model = keras.Model(inputs=input_1,  # [encoder_feat.input, encoder_image.input],
                         outputs=output_3,
