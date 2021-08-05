@@ -211,7 +211,7 @@ print_file(filename=results_logfile, text='image_count: '+str(image_count) +
 #create average image
 image_avg = image_sum / image_count
 #create mask
-limiar_mask = 0.01
+limiar_mask = 0.05
 image_mask = (image_avg > 0) & (image_avg < limiar_mask)
 #create noise cleaner 3d and 4d
 noise_cleaner = ~image_mask
@@ -221,14 +221,14 @@ noise_cleaner4d = np.repeat(noise_cleaner[:, :, :, np.newaxis], 3, axis=3)
 image_bg1_mask = (noise_cleaner * image_avg == 0)
 image_bg1_mask4d = np.repeat(image_bg1_mask[:, :, :, np.newaxis], 3, axis=3)
 print_file(filename=results_logfile, text='Saving background mask...')
-np.save('/project/data/ABCD/ABCD_bg1_mask4d.npy',image_bg1_mask4d)
-np.save(results_prefix+'ABCD_bg1_mask4d.npy',image_bg1_mask4d)
+np.save('/project/data/ABCD/ABCD_bg1_mask4d005.npy',image_bg1_mask4d)
+np.save(results_prefix+'ABCD_bg1_mask4d005.npy',image_bg1_mask4d)
 print_file(filename=results_logfile, text='Loading background mask...\n')
-image_bg1_mask4d=np.load(results_prefix + 'ABCD_bg1_mask4d.npy')
+image_bg1_mask4d=np.load(results_prefix + 'ABCD_bg1_mask4d005.npy')
 # show noise cleaner filter
 # plt.imshow((noise_cleaner4d[61,:,:,2]).astype(np.uint8))
 # plt.imshow((image_bg1_mask4d[61,:,:,2]).astype(np.uint8))
-
+# print_file(filename=results_logfile, text='##### DONE! #####\n')
 
 # read the .nii image containing the volume with SimpleITK:
 sitk_t1c1 = sitk.ReadImage(df['FNAME_C1'][0])
