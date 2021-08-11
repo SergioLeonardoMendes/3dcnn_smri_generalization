@@ -79,31 +79,28 @@ def generate_stratified_kfold(args, out_log):
 
     # create stratification
     skf = StratifiedKFold(n_splits=k, shuffle=True, random_state=args.seed)
-    skf2 = StratifiedKFold(n_splits=2, shuffle=True, random_state=args.seed)
+    skf2 = StratifiedKFold(n_splits=k, shuffle=True, random_state=args.seed)
     # classes stratification
-    for m, (train_index, valid_test_index) in enumerate(skf.split(df, df['stratify_cats'])):
+    for m, (train_valid_index, test_index) in enumerate(skf.split(df, df['stratify_cats'])):
         # create train, validation and test csv filenames for the current folder
         csv_filename_train = args.out_path_splits + "k" + str(m + 1).zfill(2) + ".train.csv"
         csv_filename_valid = args.out_path_splits + "k" + str(m + 1).zfill(2) + ".valid.csv"
         csv_filename_test = args.out_path_splits + "k" + str(m + 1).zfill(2) + ".test.csv"
-
-        # obtain train and valid_test partitions
-        df_train, df_valid_test = df.iloc[train_index], df.iloc[valid_test_index]
-        # write train filenames to csv
-        print_file(filename=out_log, text='  ' + csv_filename_train)
-        df_train.to_csv(csv_filename_train, index=False, na_rep='', columns=['filename'])
-
+        # obtain train_valid and test partitions
+        df_train_valid, df_test = df.iloc[train_valid_index], df.iloc[test_index]
         # split valid_test in validation and test partitions
-        for n, (valid_index, test_index) in enumerate(skf2.split(df_valid_test, df_valid_test['stratify_cats'])):
+        for n, (train_index, valid_index) in enumerate(skf2.split(df_train_valid, df_train_valid['stratify_cats'])):
             if n == 1:
-                df_valid, df_test = df_valid_test.iloc[valid_index], df_valid_test.iloc[test_index]
+                df_train, df_valid = df_train_valid.iloc[train_index], df_train_valid.iloc[valid_index]
+                # write train filenames to csv
+                print_file(filename=out_log, text='  ' + csv_filename_train)
+                df_train.to_csv(csv_filename_train, index=False, na_rep='', columns=['filename'])
                 # write validation filenames to csv
                 print_file(filename=out_log, text='  ' + csv_filename_valid)
                 df_valid.to_csv(csv_filename_valid, index=False, na_rep='', columns=['filename'])
-                # write test filenames to csv
-                print_file(filename=out_log, text='  ' + csv_filename_test)
-                df_test.to_csv(csv_filename_test, index=False, na_rep='', columns=['filename'])
-
+        # write test filenames to csv
+        print_file(filename=out_log, text='  ' + csv_filename_test)
+        df_test.to_csv(csv_filename_test, index=False, na_rep='', columns=['filename'])
 
 if __name__ == '__main__':
     """ 
