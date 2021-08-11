@@ -21,5 +21,6 @@
     "model_arch": "cnn3d",
     "model_outputs": "{'output1':'info/age'}",
     "model_losses": "{'output1':'MSE'}",
+    "model_out_bias": "[9.92]",
     "model_metrics": "['MeanAbsoluteError']"
 }

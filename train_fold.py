@@ -139,18 +139,17 @@ def main(arguments):
     # swa_optimizer = tfa.optimizers.MovingAverage(optimizer)
     # swa_optimizer = tfa.optimizers.SWA(optimizer)
 
-    losses = eval(ARGS.model_losses)  # {'output1': 'MSE'} # loss='sparse_categorical_crossentropy'
-    metrics = eval(ARGS.model_metrics)  # ['MeanAbsoluteError']
+    # prepare model params
+    losses = eval(ARGS.model_losses)
+    metrics = eval(ARGS.model_metrics)
+    initial_bias = eval(ARGS.model_out_bias)
+
     # ['AUC','Precision','Recall', 'BinaryAccuracy','TruePositives','FalsePositives',
     # 'TrueNegatives','FalseNegatives']
-
-    # output bias initialization
-    # ini_bias_dcany = np.log([225 / 512])  # num examples pos=512 and neg=225
+    # output bias initialization example
     # ini_bias_sex = np.log([422 / 318])  # num examples pos=422 and neg=318
     # ini_bias_age = 9.92  # age mean
-    # ini_bias_cbcltot = 27.12  # cbcltot mean
-    # initial_bias = [ini_bias_cbcltot]
-    initial_bias = None
+    # initial_bias = None
 
     # Use available GPUs through Nvidia NCCL cross device communication
     strategy = tf.distribute.MirroredStrategy()

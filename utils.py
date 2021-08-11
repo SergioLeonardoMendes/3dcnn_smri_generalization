@@ -140,6 +140,8 @@ def set_config_run_experiment():
                         help="Model output keys.")
     parser.add_argument("--model_losses", type=str, default=config['model_losses'],
                         help="Model output optimization losses.")
+    parser.add_argument("--model_out_bias", type=str, default=config['model_out_bias'],
+                        help="Model bias initialization for output layers.")
     parser.add_argument("--model_metrics", type=str, default=config['model_metrics'],
                         help="Model optimization metrics.")
     arguments = parser.parse_args()
