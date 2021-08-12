@@ -88,7 +88,7 @@ def main(args):
         df_metrics_class = df_metrics_class.append(df_tmp_class)
         # operating pointing selection: save validation cutoff_ops to use in test prediction
         if 'cutoff_ops' in df_tmp_class:
-            valid_cutoff = df_tmp_class['cutoff_ops']
+            valid_cutoff = df_tmp_class['cutoff_ops'].values
         else:
             valid_cutoff = None
 
