@@ -53,11 +53,17 @@ class LogMetricsCallback(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         elapsed_time = tf.timestamp() - self.start_time
-        print_file(filename=ARGS.log_file,
-                   text="  Epoch %04d: time=%ds loss=%.2f val_loss=%.2f mae=%.2f val_mae=%.2f"
-                        % (epoch, elapsed_time, logs['loss'], logs['val_loss'],  # logs['auc'], logs['val_auc'])
-                            logs['mean_absolute_error'], logs['val_mean_absolute_error'])
-        )
+
+        if out_activation[0] == 'sigmoid':
+            print_file(filename=ARGS.log_file,
+                       text="  Epoch %04d: time=%ds loss=%.2f val_loss=%.2f auc=%.2f val_auc=%.2f"
+                            % (epoch, elapsed_time, logs['loss'], logs['val_loss'],  # logs['auc'], logs['val_auc'])
+                               logs['auc'], logs['val_auc']))
+        else:
+            print_file(filename=ARGS.log_file,
+                       text="  Epoch %04d: time=%ds loss=%.2f val_loss=%.2f mae=%.2f val_mae=%.2f"
+                            % (epoch, elapsed_time, logs['loss'], logs['val_loss'],  # logs['auc'], logs['val_auc'])
+                                logs['mean_absolute_error'], logs['val_mean_absolute_error']))
         if logs['val_loss'] < self.best_val_loss:
             self.best_val_loss = logs['val_loss']
             print_file(filename=ARGS.log_file, text="  A better model was encountered. MODEL SAVED!")
@@ -143,6 +149,14 @@ def main(arguments):
     losses = eval(ARGS.model_losses)
     metrics = eval(ARGS.model_metrics)
     initial_bias = eval(ARGS.model_out_bias)
+    global out_activation
+    out_activation = []
+    for output_name, loss in eval(ARGS.model_losses).items():
+        if loss == 'MSE' or loss == 'MAE':
+            out_activation.append('relu')
+        elif loss == 'binary_crossentropy':
+            out_activation.append('sigmoid')
+
 
     # ['AUC','Precision','Recall', 'BinaryAccuracy','TruePositives','FalsePositives',
     # 'TrueNegatives','FalseNegatives']
@@ -156,7 +170,7 @@ def main(arguments):
     print_file(filename=ARGS.log_file, text="  Distribute strategy: " + str(strategy.__class__.__name__))
     with strategy.scope():
         # input shape of the model=((x_axis, y_axis, z_axix, alpha), output_classes)
-        model_str = ARGS.model_arch + '(IMAGE_SIZE_OUT, output_bias=initial_bias, ' \
+        model_str = ARGS.model_arch + '(IMAGE_SIZE_OUT, out_activation, output_bias=initial_bias, ' \
                                       'kern_reg_l2=ARGS.kern_reg_l2, dropout=ARGS.dropout)'
         model = eval(model_str)
         model.compile(optimizer=optimizer, loss=losses, metrics=metrics)  # loss_weights=[0.5, 1, 0.5],

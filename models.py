@@ -215,7 +215,7 @@ def cnn3d_v3(input_dim, output_bias=None, kern_reg_l2=0.001, dropout=0.5):
 
 
 
-def cnn3d_cole(input_dim, output_bias=None, kern_reg_l2=0.001, dropout=0.5):
+def cnn3d_cole(input_dim, out_activation, output_bias=None, kern_reg_l2=0.001, dropout=0.5):
     if output_bias is not None:
         out_bias_output1 = tf.keras.initializers.Constant(output_bias[0])
     else:
@@ -278,7 +278,7 @@ def cnn3d_cole(input_dim, output_bias=None, kern_reg_l2=0.001, dropout=0.5):
     out_common = BatchNormalization(name='out_common')(x)
 
     # predict output1
-    output_1 = Dense(1, bias_initializer=out_bias_output1, activation='relu',
+    output_1 = Dense(1, bias_initializer=out_bias_output1, activation=out_activation[0],
                      name='output1', dtype='float32')(out_common)
 
     model = keras.Model(inputs=input_1,
