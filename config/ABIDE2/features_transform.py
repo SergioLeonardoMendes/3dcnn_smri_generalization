@@ -9,6 +9,6 @@ def features_transform(example):
 
     # map health control (label=2 to label=0) DX_GROUP=2 is autism
     if example['info/DX_GROUP'] == 2:
-        example['info/DX_GROUP'] = tf.cast(0, tf.float32)
+        example['info/DX_GROUP'] = tf.cast(0, tf.int64)
 
     return example
