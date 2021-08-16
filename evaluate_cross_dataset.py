@@ -9,7 +9,25 @@ def main(arguments):
     # predict metrics
     print_file(filename=args.log_file, text='\n  Predicting cross dataset and collecting metrics:')
     print_file(filename=args.log_file, text='  ' + args.result_metrics_path + 'cross_dataset.metrics\n')
-    predict(args, args.full_dataset_csv_path, metrics_out_filepath=args.result_metrics_path + 'cross_dataset.metrics')
+
+    df_metrics_reg, df_metrics_class = predict(args, args.full_dataset_csv_path,
+                                               metrics_out_filepath=args.result_metrics_path + 'cross_dataset.metrics')
+    df_metrics_reg.insert(loc=0, column='fold', value='all_data')
+    df_metrics_class.insert(loc=0, column='fold', value='all_data')
+    df_metrics_reg.insert(loc=0, column='partition', value='cross_dataset')
+    df_metrics_class.insert(loc=0, column='partition', value='cross_dataset')
+    # clear dataframes' indices
+    blank_idx = [''] * len(df_metrics_reg)
+    df_metrics_reg.index = blank_idx
+    blank_idx = [''] * len(df_metrics_class)
+    df_metrics_class.index = blank_idx
+    # print resultant dataframes
+    print_file(filename=args.log_file, text='\n----- Write metrics to csv files -----')
+    print_file(filename=args.log_file, text='  ' + args.result_metrics_path + 'metrics_regression.csv')
+    print_file(filename=args.log_file, text='  ' + args.result_metrics_path + 'metrics_classification.csv')
+    df_metrics_reg.to_csv(args.result_metrics_path + 'metrics_regression.csv')
+    df_metrics_class.to_csv(args.result_metrics_path + 'metrics_classification.csv')
+
     print_file(filename=args.log_file, text="\n----- DONE! -----")
 
 
