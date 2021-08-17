@@ -45,8 +45,8 @@ def metrics_classification(name_output, ids_output, labels_output, predictions_o
     print_file('\n--- Detailed Predictions:', log_output)
     print_file('\nsubjectid,target,predicted', log_output)
     for i in range(num_examples):
-        print_file(str(ids_output[i]) + ', '
-                   + str(np.round(labels_output[i], 1)) + ', '
+        print_file(str(ids_output[i]) + ','
+                   + str(np.round(labels_output[i], 1)) + ','
                    + str(np.round(predictions_output[i], 1)), log_output)
 
     # search for the best cutoff and assign it to best_cutoff
@@ -121,8 +121,8 @@ def metrics_regression(name_output, ids_output, labels_output, predictions_outpu
     print_file('\nsubjectid,target,predicted,deviation', log_output)
     for i in range(len(labels_output)):
         print_file(str(ids_output[i]) + ', '
-                   + str(np.round(labels_output[i], 1)) + ', '
-                   + str(np.round(predictions_output[i], 1)) + ', '
+                   + str(np.round(labels_output[i], 1)) + ','
+                   + str(np.round(predictions_output[i], 1)) + ','
                    + str(np.round(predictions_output[i] - labels_output[i], 1)), log_output)
 
     # Scatter Plot
