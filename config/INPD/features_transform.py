@@ -17,4 +17,7 @@ def features_transform(example):
     # create cl_tot normalized
     example['info/cl_tot_norm'] = tf.cast(example['info/cl_tot'], tf.float32) / 151.0
 
+    # create age feature in month scale
+    example['info/age_month'] = example['info/age'] * 12.0
+
     return example

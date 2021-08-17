@@ -11,4 +11,7 @@ def features_transform(example):
     if example['info/DX_GROUP'] == 2:
         example['info/DX_GROUP'] = tf.cast(0, tf.int64)
 
+    # create age feature in month scale
+    example['info/AGE_AT_SCAN_MONTH'] = example['info/AGE_AT_SCAN'] * 12.0
+
     return example

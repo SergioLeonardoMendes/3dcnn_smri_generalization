@@ -12,4 +12,7 @@ def features_transform(example):
     else:
         example['info/DX_ALL'] = 1
 
+    # create age feature in month scale
+    example['info/AGE_MONTH'] = example['info/AGE'] * 12.0
+
     return example
