@@ -142,7 +142,7 @@ def metrics_regression(name_output, ids_output, labels_output, predictions_outpu
     y_axe = np.linspace(p(x).min(), p(x).max(), 3000)
     ax.plot(x_axe, y_axe, "blue", ls='-', lw=2, label='Model linear fit')
     ax.plot(x_axe, x_axe, "limegreen", ls='-', lw=2, label='Ideal linear fit')
-    ax.legend(bbox_to_anchor=(0, 0.88), loc='upper left')
+    ax.legend(bbox_to_anchor=(0, 0.90), loc='upper left')
     text_str = ('$\it{n=' + str(num_examples) +
                 ', MAE='+str(np.round(mae, 2)) +
                 ', r=' + str(np.round(pearson_coef, 2)) + '}$')
