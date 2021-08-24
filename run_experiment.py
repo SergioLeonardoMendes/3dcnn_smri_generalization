@@ -3,6 +3,7 @@ import copy
 import pandas as pd
 import train_fold
 from predict import predict
+from saliency_maps import generate_saliency_maps
 from utils import *
 
 def main(args):
@@ -33,6 +34,9 @@ def main(args):
     # create new Pandas metrics dataframe
     df_metrics_reg, df_metrics_class = pd.DataFrame(), pd.DataFrame()
 
+    # saliency maps list
+    saliency_list, brain_list = [], []
+
     # iterate and run each fold number
     for i in range(args.n_folds_run):
         str_current_k = "k" + str(i + 1).zfill(2)
@@ -55,7 +59,7 @@ def main(args):
                 train_fold.main(args_fold)
             else:
                 print_file(filename=args.log_file,
-                           text='\n  WARN: Output path already exists. Skipping: ' + args_fold.out_path)
+                           text='\n  WARN: Training output path already exists. Skipping: ' + args_fold.out_path)
         else:
             print_file(filename=args.log_file, text='\n  ERROR: train, validation or test csv files do not exist! Exiting...')
             exit(2)
@@ -92,9 +96,6 @@ def main(args):
         else:
             valid_cutoff = None
 
-        # print_file(filename=args.log_file, text="\n  Finding operation point selection: validation set")
-        # pass
-
         print_file(filename=args.log_file, text='\n  Predicting test set and collecting metrics:')
         print_file(filename=args.log_file, text='  ' + result_metrics_path + 'test_dataset.metrics\n')
         df_tmp_reg, df_tmp_class = predict(args_fold, args_fold.test_csv_path,
@@ -106,6 +107,15 @@ def main(args):
         df_tmp_class.insert(loc=0, column='partition', value='test_set')
         df_metrics_reg = df_metrics_reg.append(df_tmp_reg)
         df_metrics_class = df_metrics_class.append(df_tmp_class)
+
+        print_file(filename=args.log_file, text='\n  Generating test set salience and brain maps (SmoothGrad):')
+        saliency_mean, brain_mean = generate_saliency_maps(args_fold, examples_to_map=args_fold.test_csv_path)
+        saliency_list.append(saliency_mean)
+        brain_list.append(brain_mean)
+        print_file(filename=args.log_file, text='  ' + result_metrics_path + 'saliency_mean.npy')
+        np.save(result_metrics_path + 'saliency_mean.npy', saliency_mean)
+        print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean.npy')
+        np.save(result_metrics_path + 'brain_mean.npy', brain_mean)
 
     # clear dataframes' indices
     blank_idx = [''] * len(df_metrics_reg)
@@ -122,6 +132,15 @@ def main(args):
     print_file(filename=args.log_file, text=df_metrics_reg.to_string())
     print_file(filename=args.log_file, text='\n----- Classification Metrics -----')
     print_file(filename=args.log_file, text=df_metrics_class.to_string())
+
+    print_file(filename=args.log_file, text='\n----- Salience and brain maps (SmoothGrad) -----')
+    saliency_mean = np.mean(np.asarray(saliency_list, dtype=np.float32), axis=0)
+    brain_mean = np.mean(np.asarray(brain_list, dtype=np.float32), axis=0)
+    print_file(filename=args.log_file, text='  ' + args.out_path + '/results/saliency_mean.npy')
+    np.save(args.out_path + '/results/saliency_mean.npy', saliency_mean)
+    print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean.npy')
+    np.save(args.out_path + '/results/brain_mean.npy', brain_mean)
+
     print_file(filename=args.log_file, text="\n----- DONE! -----")
 
 
@@ -132,7 +151,7 @@ if __name__ == '__main__':
             --project_config_path /project/sources/config/INPD/ 
             --train_valid_test_path /project/data/INPD/train_valid_test/kfold10-gender0cl_tot10-seed88 
             --n_folds_run 2 
-            --model_prefix teste123_ 
+            --model_prefix test123_ 
             --csv_phenotypes /project/data/INPD/phenotypics.csv 
             --seed 77 
             --n_epochs 3 
