@@ -127,18 +127,40 @@ def metrics_regression(name_output, ids_output, labels_output, predictions_outpu
 
     # Scatter Plot
     plt.figure(10)
-    _ = plt.scatter(labels_output, predictions_output)
-    plt.title('Scatter')
-    plt.xlabel('Correct')
-    plt.ylabel('Predicted')
+    plt.clf()
+    plt.cla()
+    fig, ax = plt.subplots()
+    _ = ax.scatter(labels_output, predictions_output)
+    plt.title('Scatter Plot')
+    plt.xlabel('T A R G E T')
+    plt.ylabel('P R E D I C T I O N')
+    x = labels_output
+    y = predictions_output
+    z = np.polyfit(x, y, 1)
+    p = np.poly1d(z)
+    x_axe = np.linspace(x.min(), x.max(), 3000)
+    y_axe = np.linspace(p(x).min(), p(x).max(), 3000)
+    ax.plot(x_axe, y_axe, "blue", ls='-', lw=2, label='Model linear fit')
+    ax.plot(x_axe, x_axe, "limegreen", ls='-', lw=2, label='Ideal linear fit')
+    ax.legend(bbox_to_anchor=(0, 0.88), loc='upper left')
+    text_str = ('$\it{n=' + str(num_examples) +
+                ', MAE='+str(np.round(mae, 2)) +
+                ', r=' + str(np.round(pearson_coef, 2)) + '}$')
+    props = dict(boxstyle='round', facecolor='white', edgecolor='gray', alpha=0.5)
+    ax.text(0.027, 0.96, text_str, transform=ax.transAxes, fontsize=12,
+            verticalalignment='top', bbox=props)
     plt.savefig(results_prefix + 'predictions_scatter.png')
 
     # Plot historams
     plt.figure(12)
+    plt.clf()
+    plt.cla()
     plt.title('Histogram - Correct Targets')
     _ = plt.hist(labels_output)
     plt.savefig(results_prefix + 'targets_histogram.png')
     plt.figure(13)
+    plt.clf()
+    plt.cla()
     plt.title('Histogram - Predictions')
     _ = plt.hist(predictions_output)
     plt.savefig(results_prefix + 'predictions_histogram.png')
