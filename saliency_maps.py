@@ -6,9 +6,6 @@ import numpy as np
 import pandas as pd
 from predict import get_assess_dataset, get_dataset_iterator
 
-SMOOTH_S = 5
-SMOOTH_N = 10
-
 def generate_saliency_maps(args, examples_to_map):
     # load examples filenames in pandas dataframe
     examples_to_map = pd.read_csv(examples_to_map).values
@@ -36,7 +33,7 @@ def generate_saliency_maps(args, examples_to_map):
             x = inputs_it['image']
             # Generate saliency map for the example
             saliency_map = saliency([active_output], x,
-                                    smooth_samples=SMOOTH_S, smooth_noise=SMOOTH_N)
+                                    smooth_samples=args.smoothgrad_sample, smooth_noise=args.smoothgrad_noise)
             # append gradients and images to lists
             grad_list.extend(saliency_map)
             image_list.extend(x)

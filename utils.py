@@ -144,6 +144,10 @@ def set_config_run_experiment():
                         help="Model bias initialization for output layers.")
     parser.add_argument("--model_metrics", type=str, default=config['model_metrics'],
                         help="Model optimization metrics.")
+    parser.add_argument("--smoothgrad_sample", type=int, default=config['smoothgrad_sample'],
+                        help="Smoothgrad sample configuration.")
+    parser.add_argument("--smoothgrad_noise", type=int, default=config['smoothgrad_noise'],
+                        help="Smoothgrad noise configuration.")
     arguments = parser.parse_args()
 
     # compose final arguments based on user inputs
