@@ -22,5 +22,7 @@
     "model_outputs": "{'output1':'info/interview_age'}",
     "model_losses": "{'output1':'MSE'}",
     "model_out_bias": "[119.04]",
-    "model_metrics": "['MeanAbsoluteError']"
+    "model_metrics": "['MeanAbsoluteError']",
+    "smoothgrad_sample": 5,
+    "smoothgrad_noise": 10
 }
