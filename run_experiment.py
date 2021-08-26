@@ -3,7 +3,7 @@ import copy
 import pandas as pd
 import train_fold
 from predict import predict
-from saliency_maps import generate_saliency_maps
+from saliency_maps import generate_saliency_maps, normalize_saliency_maps, save_saliency_brain_nii
 from utils import *
 
 def main(args):
@@ -29,7 +29,6 @@ def main(args):
     while os.path.exists(args.log_file):
         log_count += 1
         args.log_file = log_file_ori.replace('.', '_' + str(log_count) + '.')
-    # os.remove(args.log_file) if os.path.exists(args.log_file) else None
 
     # print configs of the experiment
     print_configs(args)
@@ -128,6 +127,10 @@ def main(args):
             np.save(result_metrics_path + 'saliency_mean.npy', saliency_mean)
             print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean.npy')
             np.save(result_metrics_path + 'brain_mean.npy', brain_mean)
+            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'saliency_mean.nii')
+            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean_gm.nii')
+            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean_wm.nii')
+            save_saliency_brain_nii(result_metrics_path, saliency_mean, brain_mean)
 
     if Path(args.out_path + '/results/metrics_regression.csv').is_file():
         print_file(filename=args.log_file,
@@ -155,11 +158,16 @@ def main(args):
     else:
         print_file(filename=args.log_file, text='\n----- Salience and brain maps (SmoothGrad) -----')
         saliency_mean = np.mean(np.asarray(saliency_list, dtype=np.float32), axis=0)
+        saliency_mean_normalized = normalize_saliency_maps(saliency_mean)
         brain_mean = np.mean(np.asarray(brain_list, dtype=np.float32), axis=0)
         print_file(filename=args.log_file, text='  ' + args.out_path + '/results/saliency_mean.npy')
-        np.save(args.out_path + '/results/saliency_mean.npy', saliency_mean)
+        np.save(args.out_path + '/results/saliency_mean.npy', saliency_mean_normalized)
         print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean.npy')
         np.save(args.out_path + '/results/brain_mean.npy', brain_mean)
+        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/saliency_mean.nii')
+        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_gm.nii')
+        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_wm.nii')
+        save_saliency_brain_nii(args.out_path + '/results/', saliency_mean_normalized, brain_mean)
 
     print_file(filename=args.log_file, text="\n----- DONE! -----")
 

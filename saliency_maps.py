@@ -1,10 +1,14 @@
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras import backend as k
 from tf_keras_vis.saliency import Saliency
 from tf_keras_vis.utils.model_modifiers import ReplaceToLinear
+import SimpleITK as sitk
 import numpy as np
 import pandas as pd
 from predict import get_assess_dataset, get_dataset_iterator
+
+template_config_path = '/project/sources/config/'
 
 def generate_saliency_maps(args, examples_to_map):
     # load examples filenames in pandas dataframe
@@ -33,7 +37,8 @@ def generate_saliency_maps(args, examples_to_map):
             x = inputs_it['image']
             # Generate saliency map for the example
             saliency_map = saliency([active_output], x,
-                                    smooth_samples=args.smoothgrad_sample, smooth_noise=args.smoothgrad_noise)
+                                    smooth_samples=args.smoothgrad_sample,
+                                    smooth_noise=args.smoothgrad_noise)
             # append gradients and images to lists
             grad_list.extend(saliency_map)
             image_list.extend(x)
@@ -41,7 +46,48 @@ def generate_saliency_maps(args, examples_to_map):
         except StopIteration:
             has_elements = False
             pass
+    # load brain mask and pad it to the same format of dataset images
+    brain_mask4d = np.int64(np.load(args.bg_mask))
+    paddings = tf.constant([[3, 4, ], [0, 0], [3, 4], [0, 0]])
+    brain_mask4d = tf.pad(brain_mask4d[:, 11:-6, :, :], paddings, "CONSTANT", constant_values=1)
+    # saliency and brain means
     saliency_mean = np.mean(grad_list, axis=0)[:, :, :]
-    brain_mean = np.mean(image_list, axis=0)[:, :, :]
+    saliency_mean = saliency_mean * np.float32(tf.cast((brain_mask4d[:, :, :, 0] != 1), tf.float32))
+    brain_mean = np.mean(image_list, axis=0)[:, :, :, :]
+    brain_mean = brain_mean * np.float32(tf.cast((brain_mask4d[:, :, :, :2] != 1), tf.float32))
+    # normalize saliency between 0-1
+    saliency_mean_normalized = normalize_saliency_maps(saliency_mean)
 
-    return saliency_mean, brain_mean
+    return saliency_mean_normalized, brain_mean
+
+def normalize_saliency_maps(saliency_mean):
+    normalized_saliency_mean = saliency_mean / np.max(saliency_mean)
+    return normalized_saliency_mean
+
+def save_saliency_brain_nii(result_metrics_path, saliency_mean, brain_mean):
+    metadata_template = template_config_path + 'metadata_template_1-5mm.nii'
+    # reshape images to 121x145x121 (voxel_size = 1.5 mm)
+    paddings_saliency = tf.constant([[0, 0], [11, 6], [0, 0]])  # mask to pad
+    paddings_brain = tf.constant([[0, 0], [11, 6], [0, 0], [0, 0]])  # mask to pad
+    saliency_mean_reshaped = tf.pad(saliency_mean[3:-4, :, 3:-4],
+                                    paddings_saliency, "CONSTANT")
+    brain_mean_reshaped = tf.pad(brain_mean[3:-4, :, 3:-4, :],
+                                 paddings_brain, "CONSTANT")
+    # read metadata
+    nii_metadata = sitk.ReadImage(metadata_template)
+    # write attention mean to nifti file
+    nii_saliency = sitk.GetImageFromArray(saliency_mean_reshaped)
+    nii_saliency.CopyInformation(nii_metadata)
+    sitk.WriteImage(nii_saliency, result_metrics_path + 'saliency_mean.nii')
+    # write brain GM mean to nifti file
+    nii_brain_gm = sitk.GetImageFromArray(brain_mean_reshaped[:, :, :, 0])
+    nii_brain_gm.CopyInformation(nii_metadata)
+    sitk.WriteImage(nii_brain_gm, result_metrics_path + 'brain_mean_gm.nii')
+    # write brain WM mean to nifti file
+    nii_brain_wm = sitk.GetImageFromArray(brain_mean_reshaped[:, :, :, 1])
+    nii_brain_wm.CopyInformation(nii_metadata)
+    sitk.WriteImage(nii_brain_wm, result_metrics_path + 'brain_mean_wm.nii')
+
+def find_top_focussed_rois(args, top_percentage=0.025):
+    aal3_template = template_config_path + 'AAL3v1_1-5mm.nii'
+    aal3_labels = template_config_path + 'AAL3v1.nii.txt'
