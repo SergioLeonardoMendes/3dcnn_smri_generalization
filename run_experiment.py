@@ -3,7 +3,7 @@ import copy
 import pandas as pd
 import train_fold
 from predict import predict
-from saliency_maps import generate_saliency_maps, normalize_saliency_maps, save_saliency_brain_nii
+from saliency_maps import generate_saliency_maps, normalize_saliency_maps, save_saliency_brain_nii, map_attention_rois
 from utils import *
 
 def main(args):
@@ -168,6 +168,15 @@ def main(args):
         print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_gm.nii')
         print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_wm.nii')
         save_saliency_brain_nii(args.out_path + '/results/', saliency_mean_normalized, brain_mean)
+
+    if Path(args.out_path + '/results/attention_rois.csv').is_file():
+        print_file(filename=args.log_file,
+                   text='\n  WARN: attention_rois.csv already exists. Skipping... ')
+    else:
+        print_file(filename=args.log_file, text='\n----- Attention brain ROIs -----')
+        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/attention_rois.csv')
+        df_rois = map_attention_rois(args)
+        df_rois.to_csv(args.out_path + '/results/attention_rois.csv')
 
     print_file(filename=args.log_file, text="\n----- DONE! -----")
 

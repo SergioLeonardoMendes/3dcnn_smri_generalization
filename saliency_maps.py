@@ -88,6 +88,33 @@ def save_saliency_brain_nii(result_metrics_path, saliency_mean, brain_mean):
     nii_brain_wm.CopyInformation(nii_metadata)
     sitk.WriteImage(nii_brain_wm, result_metrics_path + 'brain_mean_wm.nii')
 
-def find_top_focussed_rois(args, top_percentage=0.025):
-    aal3_template = template_config_path + 'AAL3v1_1-5mm.nii'
-    aal3_labels = template_config_path + 'AAL3v1.nii.txt'
+def map_attention_rois(args):
+    # aal template files
+    aal3_template_file = template_config_path + 'AAL3v1_1-5mm.nii'
+    aal3_labels_file = template_config_path + 'AAL3v1.nii.txt'
+    # attention gradients file
+    grads_file = args.out_path + '/results/saliency_mean.nii'
+    # read attention gradients
+    grads_nii = sitk.ReadImage(grads_file)
+    attention_grads = sitk.GetArrayFromImage(grads_nii)
+    # read aal3 data matrix
+    aal3_nii = sitk.ReadImage(aal3_template_file)
+    aal3_atlas = sitk.GetArrayFromImage(aal3_nii)
+    # read aal3 labels
+    df_atlas = pd.read_csv(aal3_labels_file, usecols=[0, 1], sep=' ', header=None, names=['id', 'name'])
+    # calculate gradients' sum and average from each atlas roi
+    row_list = []
+    for cod, description in zip(df_atlas['id'].values, df_atlas['name'].values):
+        mask = (aal3_atlas == cod)
+        res_grads = attention_grads * mask
+        v_sum = np.sum(res_grads)
+        v_avg = (np.sum(res_grads) / np.sum(mask)) if (np.sum(mask) > 0) else 0.0
+        grads_total = {'atlas_id': cod, 'atlas_descr': description, 'grads_sum': v_sum, 'grads_avg': v_avg}
+        row_list.append(grads_total)
+        # print(grads_total)
+    # store values in pandas dataframe
+    df_attention_rois = pd.DataFrame(row_list)
+    # sort by gradients average
+    df_attention_rois = df_attention_rois.sort_values(by=['grads_avg'], ascending=False)
+
+    return df_attention_rois
