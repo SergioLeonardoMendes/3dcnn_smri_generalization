@@ -23,6 +23,6 @@
     "model_losses": "{'output1':'MSE'}",
     "model_out_bias": "[12.12]",
     "model_metrics": "['MeanAbsoluteError']",
-    "smoothgrad_sample": 5,
+    "smoothgrad_sample": 50,
     "smoothgrad_noise": 10
 }
