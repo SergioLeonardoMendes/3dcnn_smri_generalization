@@ -17,7 +17,7 @@ def generate_saliency_maps(args, examples_to_map):
     model = load_model(args.out_path + 'checkpoints/best_model')
     # assign the dataset and iterator
     dataset = get_assess_dataset(args, examples_to_map)
-    iterator = get_dataset_iterator(dataset, np.round(args.batch_size/5))
+    iterator = get_dataset_iterator(dataset, np.round(args.batch_size/6))
     # create tf-keras-vis objects
     replace2linear = ReplaceToLinear()
     saliency = Saliency(model,
