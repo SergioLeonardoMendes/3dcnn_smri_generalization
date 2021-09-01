@@ -176,6 +176,8 @@ def main(args):
         print_file(filename=args.log_file, text='\n----- Attention brain ROIs -----')
         print_file(filename=args.log_file, text='  ' + args.out_path + '/results/attention_rois.csv')
         df_rois = map_attention_rois(args)
+        blank_idx = [''] * len(df_rois)  # clear dataframes' indices
+        df_rois.index = blank_idx
         df_rois.to_csv(args.out_path + '/results/attention_rois.csv')
 
     print_file(filename=args.log_file, text="\n----- DONE! -----")
