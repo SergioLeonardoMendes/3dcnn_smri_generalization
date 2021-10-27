@@ -211,6 +211,8 @@ def set_config_evaluate_cross_dataset():
     config['batch_size'] = config_model['batch_size']
     config['augment'] = config_model['augment']
     config['seed'] = config_model['seed']
+    config['smoothgrad_sample'] = config_model['smoothgrad_sample']
+    config['smoothgrad_noise'] = config_model['smoothgrad_noise']
     # generated based on input values
     config['saved_model_path'] = partial_arguments.saved_model_path
     if config['saved_model_path'][-1:] != '/':
