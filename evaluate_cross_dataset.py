@@ -69,7 +69,7 @@ def main(arguments):
     else:
         print_file(filename=args.log_file, text='\n----- Attention brain ROIs -----')
         print_file(filename=args.log_file, text='  ' + args.result_metrics_path + 'attention_rois.csv')
-        df_rois = map_attention_rois(args)
+        df_rois = map_attention_rois(args,args.result_metrics_path + 'saliency_mean.nii')
         blank_idx = [''] * len(df_rois)  # clear dataframes' indices
         df_rois.index = blank_idx
         df_rois.to_csv(args.result_metrics_path + 'attention_rois.csv')

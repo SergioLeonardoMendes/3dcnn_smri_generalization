@@ -88,12 +88,13 @@ def save_saliency_brain_nii(result_metrics_path, saliency_mean, brain_mean):
     nii_brain_wm.CopyInformation(nii_metadata)
     sitk.WriteImage(nii_brain_wm, result_metrics_path + 'brain_mean_wm.nii')
 
-def map_attention_rois(args):
+def map_attention_rois(args, grads_file=''):
     # aal template files
     aal3_template_file = template_config_path + 'AAL3v1_1-5mm.nii'
     aal3_labels_file = template_config_path + 'AAL3v1.nii.txt'
     # attention gradients file
-    grads_file = args.out_path + '/results/saliency_mean.nii'
+    if grads_file == '':
+        grads_file = args.out_path + '/results/saliency_mean.nii'
     # read attention gradients
     grads_nii = sitk.ReadImage(grads_file)
     attention_grads = sitk.GetArrayFromImage(grads_nii)
