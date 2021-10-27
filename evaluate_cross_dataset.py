@@ -41,7 +41,7 @@ def main(arguments):
         print_file(filename=args.log_file,
                    text='\n  WARN: saliency_mean.npy from cross daraset already exists. Skipping...')
     else:
-        # saliency maps list
+        # generate saliency maps
         saliency_list, brain_list = [], []
         print_file(filename=args.log_file, text='\n  Generating cross dataset salience and brain maps (SmoothGrad):')
         saliency_mean, brain_mean = generate_saliency_maps(args, examples_to_map=args.full_dataset_csv_path)
@@ -55,6 +55,24 @@ def main(arguments):
         print_file(filename=args.log_file, text='  ' + args.result_metrics_path + 'brain_mean_gm.nii')
         print_file(filename=args.log_file, text='  ' + args.result_metrics_path + 'brain_mean_wm.nii')
         save_saliency_brain_nii(args.result_metrics_path, saliency_mean, brain_mean)
+        # normalize and re-save
+        saliency_mean = np.mean(np.asarray(saliency_list, dtype=np.float32), axis=0)
+        saliency_mean_normalized = normalize_saliency_maps(saliency_mean)
+        brain_mean = np.mean(np.asarray(brain_list, dtype=np.float32), axis=0)
+        np.save(args.result_metrics_path + 'saliency_mean.npy', saliency_mean_normalized)
+        np.save(args.result_metrics_path + 'brain_mean.npy', brain_mean)
+        save_saliency_brain_nii(args.result_metrics_path, saliency_mean_normalized, brain_mean)
+
+    if Path(args.result_metrics_path + 'attention_rois.csv').is_file():
+        print_file(filename=args.log_file,
+                   text='\n  WARN: attention_rois.csv already exists. Skipping... ')
+    else:
+        print_file(filename=args.log_file, text='\n----- Attention brain ROIs -----')
+        print_file(filename=args.log_file, text='  ' + args.result_metrics_path + 'attention_rois.csv')
+        df_rois = map_attention_rois(args)
+        blank_idx = [''] * len(df_rois)  # clear dataframes' indices
+        df_rois.index = blank_idx
+        df_rois.to_csv(args.result_metrics_path + 'attention_rois.csv')
 
     print_file(filename=args.log_file, text="\n----- DONE! -----")
 
