@@ -263,6 +263,10 @@ def set_config_evaluate_cross_dataset():
                         help="Model optimization metrics.")
     parser.add_argument("--model_outputs", type=str, default=config['model_outputs'],
                         help="Model output keys.")
+    parser.add_argument("--smoothgrad_sample", type=int, default=config['smoothgrad_sample'],
+                        help="Smoothgrad sample configuration.")
+    parser.add_argument("--smoothgrad_noise", type=int, default=config['smoothgrad_noise'],
+                        help="Smoothgrad noise configuration.")
     arguments = parser.parse_args()
 
     return arguments
