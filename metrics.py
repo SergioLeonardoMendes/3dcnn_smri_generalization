@@ -13,6 +13,17 @@ def sens_spec_h_mean(labels_output, predictions_bin):
     h_mean = 2 * sens * spec / (sens + spec)
     return sens, spec, h_mean
 
+# calculate p-value from auc using permutation
+def calc_pval_auc_permutation(y, x, auc, nsamples=1000):
+    auc_permut = np.empty(nsamples)
+    idx_p = np.arange(len(y))
+    for p in range(nsamples):
+        np.random.shuffle(idx_p)
+        roc_auc = metrics.roc_auc_score(y[idx_p], x)
+        auc_permut[p] = roc_auc
+    pval_permut = np.mean(auc_permut>=auc)
+    return np.mean(auc_permut), pval_permut
+
 
 def metrics_classification(name_output, ids_output, labels_output, predictions_output, cutoff_value, results_filepath):
     log_output = results_filepath
@@ -24,6 +35,7 @@ def metrics_classification(name_output, ids_output, labels_output, predictions_o
     num_class0 = len(labels_output) - np.sum(labels_output)
     num_class1 = np.sum(labels_output)
     auc_roc = metrics.roc_auc_score(labels_output, predictions_output)
+    auc_perm, auc_pval = calc_pval_auc_permutation(labels_output, predictions_output, auc_roc)
     simple_acc = metrics.accuracy_score(labels_output, predictions_bin)
     prec = metrics.precision_score(labels_output, predictions_bin)
     rec = metrics.recall_score(labels_output, predictions_bin)
@@ -37,6 +49,8 @@ def metrics_classification(name_output, ids_output, labels_output, predictions_o
     print_file('  Class=1 examples:' + str(num_class1), log_output)
     print_file('  Class=0 examples:' + str(num_class0) + '\n', log_output)
     print_file('  AUC/ROC: ' + str(auc_roc), log_output)
+    print_file('  AUC permutation: ' + str(auc_perm), log_output)
+    print_file('  AUC p-value: ' + str(auc_pval), log_output)
     print_file('  Simple Accuracy: ' + str(simple_acc), log_output)
     print_file('  Precision=[true_positives/(true_positives+false_positives)]: ' + str(prec), log_output)
     print_file('  Recall=[true_positives/(true_positives+false_negatives)]: ' + str(rec), log_output)
@@ -66,6 +80,8 @@ def metrics_classification(name_output, ids_output, labels_output, predictions_o
                      'cutoff_val': [cutoff_value],
                      'cutoff_ops': [best_cutoff],
                      'auc_roc': [auc_roc],
+                     'auc_permut': [auc_perm],
+                     'auc_pvalue': [auc_pval],
                      'simple_acc': [simple_acc],
                      'f1scr': [f1scr],
                      'h_mean': [h_mean],
