@@ -1,7 +1,8 @@
 import tensorflow as tf
 import numpy as np
-import cupy as cp
-from cupyx.scipy import ndimage
+# import cupy as cp
+# from cupyx.scipy import ndimage
+from scipy import ndimage
 import json
 
 # CONSTANT DECLARATIONS
@@ -50,10 +51,12 @@ def augmentation(volume, seed):
         index_axe = tf.random.stateless_categorical(logits=tf.math.log([prob_axes]),
                                                     num_samples=1, seed=seed)[0, 0].numpy()
         # rotate volume
-        cp_volume = cp.asarray(volume)
-        volume = cp.asnumpy(ndimage.rotate(cp_volume, angle=angles[index_angle],
-                                           axes=axes[index_axe], reshape=False))
-        del cp_volume
+        # cp_volume = cp.asarray(volume)
+        # volume = cp.asnumpy(ndimage.rotate(cp_volume, angle=angles[index_angle],
+        #                                    axes=axes[index_axe], reshape=False))
+        # del cp_volume
+
+        volume = ndimage.rotate(volume, angle=angles[index_angle], axes=axes[index_axe], reshape=False)
 
         return volume
 
@@ -72,9 +75,11 @@ def augmentation(volume, seed):
         shift_values = [0, 0, 0, 0]
         shift_values[index_axe] = pixels[index_pixel]
         # shift volume
-        cp_volume = cp.asarray(volume)
-        volume = cp.asnumpy(ndimage.shift(cp_volume, shift=shift_values))
-        del cp_volume
+        # cp_volume = cp.asarray(volume)
+        # volume = cp.asnumpy(ndimage.shift(cp_volume, shift=shift_values))
+        # del cp_volume
+
+        volume = ndimage.shift(volume, shift=shift_values)
 
         return volume
 
