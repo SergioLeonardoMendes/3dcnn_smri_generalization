@@ -118,19 +118,19 @@ def main(args):
         if Path(result_metrics_path + 'saliency_mean.npy').is_file():
             print_file(filename=args.log_file,
                        text='\n  WARN: saliency_mean.npy from fold already exists. Skipping...')
-        else:
-            print_file(filename=args.log_file, text='\n  Generating test set salience and brain maps (SmoothGrad):')
-            saliency_mean, brain_mean = generate_saliency_maps(args_fold, examples_to_map=args_fold.test_csv_path)
-            saliency_list.append(saliency_mean)
-            brain_list.append(brain_mean)
-            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'saliency_mean.npy')
-            np.save(result_metrics_path + 'saliency_mean.npy', saliency_mean)
-            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean.npy')
-            np.save(result_metrics_path + 'brain_mean.npy', brain_mean)
-            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'saliency_mean.nii')
-            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean_gm.nii')
-            print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean_wm.nii')
-            save_saliency_brain_nii(result_metrics_path, saliency_mean, brain_mean)
+        # else:
+        #     print_file(filename=args.log_file, text='\n  Generating test set salience and brain maps (SmoothGrad):')
+        #     saliency_mean, brain_mean = generate_saliency_maps(args_fold, examples_to_map=args_fold.test_csv_path)
+        #     saliency_list.append(saliency_mean)
+        #     brain_list.append(brain_mean)
+        #     print_file(filename=args.log_file, text='  ' + result_metrics_path + 'saliency_mean.npy')
+        #     np.save(result_metrics_path + 'saliency_mean.npy', saliency_mean)
+        #     print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean.npy')
+        #     np.save(result_metrics_path + 'brain_mean.npy', brain_mean)
+        #     print_file(filename=args.log_file, text='  ' + result_metrics_path + 'saliency_mean.nii')
+        #     print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean_gm.nii')
+        #     print_file(filename=args.log_file, text='  ' + result_metrics_path + 'brain_mean_wm.nii')
+        #     save_saliency_brain_nii(result_metrics_path, saliency_mean, brain_mean)
 
     if Path(args.out_path + '/results/metrics_regression.csv').is_file():
         print_file(filename=args.log_file,
@@ -155,30 +155,30 @@ def main(args):
     if Path(args.out_path + '/results/saliency_mean.npy').is_file():
         print_file(filename=args.log_file,
                    text='\n  WARN: mean saliency_mean.npy already exists. Skipping... ')
-    else:
-        print_file(filename=args.log_file, text='\n----- Salience and brain maps (SmoothGrad) -----')
-        saliency_mean = np.mean(np.asarray(saliency_list, dtype=np.float32), axis=0)
-        saliency_mean_normalized = normalize_saliency_maps(saliency_mean)
-        brain_mean = np.mean(np.asarray(brain_list, dtype=np.float32), axis=0)
-        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/saliency_mean.npy')
-        np.save(args.out_path + '/results/saliency_mean.npy', saliency_mean_normalized)
-        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean.npy')
-        np.save(args.out_path + '/results/brain_mean.npy', brain_mean)
-        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/saliency_mean.nii')
-        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_gm.nii')
-        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_wm.nii')
-        save_saliency_brain_nii(args.out_path + '/results/', saliency_mean_normalized, brain_mean)
+    # else:
+    #     print_file(filename=args.log_file, text='\n----- Salience and brain maps (SmoothGrad) -----')
+    #     saliency_mean = np.mean(np.asarray(saliency_list, dtype=np.float32), axis=0)
+    #     saliency_mean_normalized = normalize_saliency_maps(saliency_mean)
+    #     brain_mean = np.mean(np.asarray(brain_list, dtype=np.float32), axis=0)
+    #     print_file(filename=args.log_file, text='  ' + args.out_path + '/results/saliency_mean.npy')
+    #     np.save(args.out_path + '/results/saliency_mean.npy', saliency_mean_normalized)
+    #     print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean.npy')
+    #     np.save(args.out_path + '/results/brain_mean.npy', brain_mean)
+    #     print_file(filename=args.log_file, text='  ' + args.out_path + '/results/saliency_mean.nii')
+    #     print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_gm.nii')
+    #     print_file(filename=args.log_file, text='  ' + args.out_path + '/results/brain_mean_wm.nii')
+    #     save_saliency_brain_nii(args.out_path + '/results/', saliency_mean_normalized, brain_mean)
 
     if Path(args.out_path + '/results/attention_rois.csv').is_file():
         print_file(filename=args.log_file,
                    text='\n  WARN: attention_rois.csv already exists. Skipping... ')
-    else:
-        print_file(filename=args.log_file, text='\n----- Attention brain ROIs -----')
-        print_file(filename=args.log_file, text='  ' + args.out_path + '/results/attention_rois.csv')
-        df_rois = map_attention_rois(args)
-        blank_idx = [''] * len(df_rois)  # clear dataframes' indices
-        df_rois.index = blank_idx
-        df_rois.to_csv(args.out_path + '/results/attention_rois.csv')
+    # else:
+    #     print_file(filename=args.log_file, text='\n----- Attention brain ROIs -----')
+    #     print_file(filename=args.log_file, text='  ' + args.out_path + '/results/attention_rois.csv')
+    #     df_rois = map_attention_rois(args)
+    #     blank_idx = [''] * len(df_rois)  # clear dataframes' indices
+    #     df_rois.index = blank_idx
+    #     df_rois.to_csv(args.out_path + '/results/attention_rois.csv')
 
     print_file(filename=args.log_file, text="\n----- DONE! -----")
 
